@@ -19,8 +19,12 @@ import {
     ShoppingItem as ShoppingItemType,
     togglePurchased,
 } from '../store/shoppingListSlice';
+import { useShoppingListPersistence } from '../store/usePersistence';
 
 export default function Index() {
+  // Enable automatic persistence
+  useShoppingListPersistence();
+  
   const dispatch = useAppDispatch();
   const items = useAppSelector((state) => state.shoppingList.items);
   const [editingItem, setEditingItem] = useState<ShoppingItemType | null>(null);

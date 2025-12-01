@@ -46,8 +46,11 @@ const shoppingListSlice = createSlice({
     clearList: (state) => {
       state.items = [];
     },
+    loadItems: (state, action: PayloadAction<ShoppingItem[]>) => {
+      state.items = action.payload;
+    },
   },
 });
 
-export const { addItem, editItem, deleteItem, togglePurchased, clearList } = shoppingListSlice.actions;
+export const { addItem, editItem, deleteItem, togglePurchased, clearList, loadItems } = shoppingListSlice.actions;
 export default shoppingListSlice.reducer;
