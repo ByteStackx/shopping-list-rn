@@ -10,6 +10,8 @@ import {
 import AddItemForm from '../components/AddItemForm';
 import EditItemModal from '../components/EditItemModal';
 import ShoppingItemComponent from '../components/ShoppingItem';
+import Toast from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
     addItem,
@@ -29,9 +31,19 @@ export default function Index() {
   const items = useAppSelector((state) => state.shoppingList.items);
   const [editingItem, setEditingItem] = useState<ShoppingItemType | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const { toast, showToast, hideToast } = useToast();
 
   const handleAddItem = (name: string, quantity: number, category?: string) => {
-    dispatch(addItem({ name, quantity, category }));
+    try {
+      dispatch(addItem({ name, quantity, category }));
+      showToast(`"${name}" added to list`, 'success');
+    } catch (error) {
+      showToast('Failed to add item. Please try again.', 'error');
+    }
+  };
+
+  const handleAddError = (message: string) => {
+    showToast(message, 'error');
   };
 
   const handleEditItem = (item: ShoppingItemType) => {
@@ -40,12 +52,24 @@ export default function Index() {
   };
 
   const handleSaveEdit = (item: ShoppingItemType) => {
-    dispatch(editItem(item));
-    setModalVisible(false);
-    setEditingItem(null);
+    try {
+      dispatch(editItem(item));
+      showToast(`"${item.name}" updated successfully`, 'success');
+      setModalVisible(false);
+      setEditingItem(null);
+    } catch (error) {
+      showToast('Failed to update item. Please try again.', 'error');
+    }
+  };
+
+  const handleEditError = (message: string) => {
+    showToast(message, 'error');
   };
 
   const handleDeleteItem = (id: string) => {
+    const item = items.find(i => i.id === id);
+    const itemName = item?.name || 'Item';
+    
     Alert.alert(
       'Delete Item',
       'Are you sure you want to delete this item?',
@@ -54,7 +78,14 @@ export default function Index() {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () => dispatch(deleteItem(id)),
+          onPress: () => {
+            try {
+              dispatch(deleteItem(id));
+              showToast(`"${itemName}" deleted`, 'info');
+            } catch (error) {
+              showToast('Failed to delete item. Please try again.', 'error');
+            }
+          },
         },
       ]
     );
@@ -75,7 +106,15 @@ export default function Index() {
         {
           text: 'Clear',
           style: 'destructive',
-          onPress: () => dispatch(clearList()),
+          onPress: () => {
+            try {
+              const count = items.length;
+              dispatch(clearList());
+              showToast(`${count} item${count !== 1 ? 's' : ''} cleared`, 'info');
+            } catch (error) {
+              showToast('Failed to clear list. Please try again.', 'error');
+            }
+          },
         },
       ]
     );
@@ -103,7 +142,7 @@ export default function Index() {
         )}
       </View>
 
-      <AddItemForm onAdd={handleAddItem} />
+      <AddItemForm onAdd={handleAddItem} onError={handleAddError} />
 
       {items.length === 0 ? (
         <View style={styles.emptyContainer}>
@@ -134,6 +173,14 @@ export default function Index() {
           setModalVisible(false);
           setEditingItem(null);
         }}
+        onError={handleEditError}
+      />
+
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={hideToast}
       />
     </View>
   );
