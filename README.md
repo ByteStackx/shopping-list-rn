@@ -112,4 +112,4 @@ cmd /c "npm install"
 - Expo Docs: https://docs.expo.dev
 - Expo Router: https://docs.expo.dev/router/introduction/
 - Redux Toolkit: https://redux-toolkit.js.org/
-
+- App Download Link: https://drive.google.com/drive/u/1/folders/1AFwuSr9TWEiMKrCORq06ETUjg9V6PHSE
